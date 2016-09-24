@@ -1,0 +1,23 @@
+{
+  "name": "svencc/pachisi",
+  "description": "A small 'Mensch ärgere dich nicht' demonstration",
+  "minimum-stability": "stable",
+  "license": "MIT License",
+  "authors": [
+    {
+      "name": "Sven Carrillo Castillo",
+      "email": "email@example.com"
+    }
+  ],
+  "require": {
+    "phpunit/phpunit": "5.5.5"
+  },
+
+  "autoload": {
+    "psr-4": {
+      "Pachisi\\": "src/",
+      "Pachisi\\Tests\\": "tests/"
+    }
+  }
+
+}
