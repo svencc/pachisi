@@ -38,11 +38,6 @@ class GameController {
     /** @var  StrategyAbstract */
     protected $_strategy;
 
-//    /**
-//     * @var Man[]
-//     */
-//    protected $_manList    = array();
-
     public function addPlayers(PlayerCollection $collection) {
         /** @var Player $player */
         foreach($collection->iterateCollection() as $player) {
@@ -74,6 +69,7 @@ class GameController {
     }
 
     protected function playRound() {
+        var_dump('next round');
         foreach($this->_playerList as $player) {
             $numberOfDicePoints = $this->_dice->rollDice();
             $this->_strategy->play($player, $numberOfDicePoints, $this->_gameBoard);

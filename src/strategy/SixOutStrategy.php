@@ -12,6 +12,21 @@ use Pachisi\Board\GameBoardAbstract;
 class SixOutStrategy extends StrategyAbstract {
 
     protected function _applyStrategy(Player $player, $numberOfDicePoints, GameBoardAbstract $board) {
-        // TODO: Implement _applyStrategy() method.
+        if($numberOfDicePoints == 6) {
+            if($player->hasManInStartArea()) {
+                $startField = $board->getPlayersStartField($player);
+                if($startField->hasMan()) {
+                    if($player->getPlayerIdentifier() !== $startField->getMan()->getPlayerIdentifier()) {
+                        $newMan = $board->getPlayersStartArea($player)->getFreeMan();
+                        $board->resetManToStart($startField->getMan());
+                        $startField->attachMan($newMan);
+                    }
+                } else {
+                    $newMan = $board->getPlayersStartArea($player)->getFreeMan();
+                    $board->resetManToStart($startField->getMan());
+                    $startField->attachMan($newMan);
+                }
+            }
+        }
     }
 }

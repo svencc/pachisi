@@ -19,7 +19,17 @@ class TargetArea extends AreaAbstract {
         return !$this->_fieldList[$fieldNr-1]->hasMan();
     }
 
+    public function getField($fieldNr) {
+        return $this->_fieldList[$fieldNr-1];
+    }
+
     public function isFieldAccessible($fieldNr) {
+        try {
+            Validator::_validateRange(1,4,$fieldNr);
+        } catch (OutOfRangeException $oore) {
+            return false;
+        }
+
         $fieldIndexToCheck = $fieldNr-1;
 
         foreach($this->_fieldList as $index => $field) {
@@ -33,6 +43,19 @@ class TargetArea extends AreaAbstract {
         }
 
         return !$this->_fieldList[$fieldIndexToCheck]->hasMan();
+    }
+
+    public function attachMan($fieldNr, $man) {
+        if($this->isFieldAccessible($fieldNr)) {
+            $fieldNr-1;
+            $this->_fieldList[$fieldNr-1]->attachMan($man);
+        }
+    }
+
+    public function detachMan($fieldNr, $man) {
+        if($this->isFieldAccessible($fieldNr)) {
+            return $this->_fieldList[$fieldNr-1]->detachMan($man);
+        }
     }
 
     /**

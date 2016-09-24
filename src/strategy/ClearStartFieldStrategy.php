@@ -15,15 +15,12 @@ class ClearStartFieldStrategy extends StrategyAbstract {
         if($player->hasManOnBoard()) {
             if($player->hasManOnStartField()) {
                 $man = $player->getManOnStartField();
-                if($man->canManOnStartFieldBeMovedForward($numberOfDicePoints, $board)) {
-                    $man->moveMan($numberOfDicePoints, $board);
-                    return true;
-                } else {
-                    return false;
+
+                if($board->canManBeMovedForward($player, $numberOfDicePoints, $man)) {
+                    $fieldToMove = $board->getFieldToMove($player, $numberOfDicePoints, $man);
+                    $board->moveToField($player, $fieldToMove, $man);
                 }
             }
         }
-
-        return true;
     }
 }

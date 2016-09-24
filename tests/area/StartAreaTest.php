@@ -4,6 +4,7 @@ use \Pachisi\Man;
 use \Pachisi\Area\StartArea;
 use \Pachisi\Player;
 use \Pachisi\Field\StartField;
+use \Pachisi\Field\StartStorageField;
 use \Pachisi\Field\FieldAbstract;
 
 class StartAreaTests extends TestCase {
@@ -31,7 +32,7 @@ class StartAreaTests extends TestCase {
         $testMockup = new StartAreaTestMockup($this->_testPlayer1);
         $this->assertTrue(count($testMockup->_fieldList) == 4);
         foreach($testMockup->_fieldList as $field) {
-            $this->assertTrue($field instanceof StartField);
+            $this->assertTrue($field instanceof StartStorageField);
         }
         $this->assertTrue($testMockup->_playerIdentifier == 'id1');
     }

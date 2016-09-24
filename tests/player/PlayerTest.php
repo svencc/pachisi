@@ -12,7 +12,7 @@ class PlayerTests extends TestCase {
         $this->assertTrue(count($testPlayer->getManList()) == 4);
     }
 
-    public function testHasManOut() {
+    public function testHasManOnBoard() {
         // Player´s man are on null positions
         $testPlayer = new PlayerTestMockup(GameController::PLAYER_ID_1);
         $this->assertFalse($testPlayer->hasManOnBoard());
@@ -22,7 +22,7 @@ class PlayerTests extends TestCase {
         foreach($testPlayer->_manCollection->iterateCollection() as $man) {
             $man->setCurrentPosition(new \Pachisi\Field\StartField($testPlayer));
         }
-        $this->assertFalse($testPlayer->hasManOnBoard());
+        $this->assertTrue($testPlayer->hasManOnBoard());
 
         // One of layer´s man is set on a RegularField
         foreach($testPlayer->_manCollection->iterateCollection() as $man) {
@@ -44,7 +44,7 @@ class PlayerTests extends TestCase {
         }
         $this->assertFalse($testPlayer->hasManOnStartField());
 
-        // One of layer´s man is set on a StartField
+        // One of player´s man is set on a StartField
         foreach($testPlayer->_manCollection->iterateCollection() as $man) {
             $man->setCurrentPosition(new \Pachisi\Field\StartField($testPlayer));
             break;
@@ -63,7 +63,7 @@ class PlayerTests extends TestCase {
         }
         $this->assertFalse($testPlayer->hasManOnStartField());
 
-        // One of layer´s man is set on a StartField
+        // One of player´s man is set on a StartField
         foreach($testPlayer->_manCollection->iterateCollection() as $man) {
             $man->setCurrentPosition(new \Pachisi\Field\StartField($testPlayer));
             break;

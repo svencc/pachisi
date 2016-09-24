@@ -7,6 +7,7 @@
  */
 
 namespace Pachisi;
+use Pachisi\Board\GameBoardAbstract;
 use \Pachisi\Field\FieldAbstract;
 use \Pachisi\Validator\Exception\OutOfRangeException;
 use \Pachisi\Validator\Validator;
@@ -45,6 +46,10 @@ class Man implements iCollectibleItem  {
 
     public function getManIdentifier() {
         return "{$this->_playerIdentifier}#{$this->_tokenNumber}";
+    }
+
+    public function getPlayerIdentifier() {
+        return $this->_playerIdentifier;
     }
 
     public function getCurrentPosition() {

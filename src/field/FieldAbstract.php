@@ -22,6 +22,12 @@ abstract class FieldAbstract {
     protected $_man;
 
     /**
+     * @return Man
+     */
+    public function getMan() {
+        return $this->_man;
+    }
+    /**
      * @param $man
      *
      * @throws FieldIsNotEmptyException

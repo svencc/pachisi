@@ -10,6 +10,7 @@ namespace Pachisi;
 use Pachisi\Collection\Exception\RequestedItemNotFoundException;
 use Pachisi\Collection\iCollectibleItem;
 use Pachisi\Collection\ManCollection;
+use Pachisi\Field\StartStorageField;
 use Pachisi\Field\StartField;
 
 class Player implements iCollectibleItem {
@@ -18,16 +19,29 @@ class Player implements iCollectibleItem {
     protected $_manCollection;
 
     /**
+     * @var string
+     */
+    protected $playerIdentifier;
+
+    /**
      * @return mixed
      */
-    public function getIdentifier() {
-        return $this->_id;
+    public function getPlayerIdentifier() {
+        return $this->playerIdentifier;
     }
 
+    public function __construct($playerIdentifier) {
+        $this->playerIdentifier  = $playerIdentifier;
+        $this->_initMen();
+    }
+    /**
+     * @return bool
+     */
     public function hasManOnBoard() {
         /** @var Man $man */
         foreach($this->_manCollection->iterateCollection() as $man) {
-            if($man->getCurrentPosition() === null || $man->getCurrentPosition() instanceof StartField) {
+            var_dump($man->getCurrentPosition());
+            if( $man->getCurrentPosition() === null || $man->getCurrentPosition() instanceof StartStorageField ) {
                 continue;
             } else {
                 return true;
@@ -37,6 +51,9 @@ class Player implements iCollectibleItem {
         return false;
     }
 
+    /**
+     * @return bool
+     */
     public function hasManOnStartField() {
         /** @var Man $man */
         foreach($this->_manCollection->iterateCollection() as $man) {
@@ -48,6 +65,25 @@ class Player implements iCollectibleItem {
         return false;
     }
 
+    /**
+     * @return bool
+     */
+    public function hasManInStartArea() {
+        /** @var Man $man */
+        foreach($this->_manCollection->iterateCollection() as $man) {
+            if($man->getCurrentPosition() instanceof StartStorageField) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+
+    /**
+     * @return Man
+     * @throws RequestedItemNotFoundException
+     */
     public function getManOnStartField() {
         /** @var Man $man */
         foreach($this->_manCollection->iterateCollection() as $man) {
@@ -59,10 +95,9 @@ class Player implements iCollectibleItem {
         throw new RequestedItemNotFoundException("There is no man on StartField!");
     }
 
-//    public function getManCollection() {
-//        return $this->_manCollection;
-//    }
-
+    /**
+     * @return Man[]
+     */
     public function getManList() {
         $list = array();
         foreach($this->_manCollection->iterateCollection() as $man) {
@@ -72,29 +107,20 @@ class Player implements iCollectibleItem {
         return $list;
     }
 
-    /**
-     * @var string
-     */
-    protected $_id;
-
-    public function __construct($playerIdentifier) {
-        $this->_id  = $playerIdentifier;
-        $this->_initMen();
-    }
 
     protected function _initMen() {
         $this->_manCollection = new ManCollection();
-        $this->_manCollection->addToCollection(new Man($this->_id, 0));
-        $this->_manCollection->addToCollection(new Man($this->_id, 1));
-        $this->_manCollection->addToCollection(new Man($this->_id, 2));
-        $this->_manCollection->addToCollection(new Man($this->_id, 3));
+        $this->_manCollection->addToCollection(new Man($this->playerIdentifier, 0));
+        $this->_manCollection->addToCollection(new Man($this->playerIdentifier, 1));
+        $this->_manCollection->addToCollection(new Man($this->playerIdentifier, 2));
+        $this->_manCollection->addToCollection(new Man($this->playerIdentifier, 3));
     }
 
     /**
      * @return string
      */
     public function getUID() {
-        return $this->_id;
+        return $this->playerIdentifier;
     }
 
 }

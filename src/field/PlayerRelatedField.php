@@ -19,7 +19,7 @@ class PlayerRelatedField extends RegularField  {
     protected $_relatedPlayerIdentifier;
 
     public function __construct(Player $player) {
-        $this->_relatedPlayerIdentifier = $player->getIdentifier();
+        $this->_relatedPlayerIdentifier = $player->getPlayerIdentifier();
     }
 
     /**

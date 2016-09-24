@@ -11,7 +11,7 @@ use Pachisi\Area\Exception\AreaIsEmptyException;
 use Pachisi\Area\Exception\AreaOverflowException;
 use Pachisi\Man;
 use Pachisi\Player;
-use Pachisi\Field\StartField;
+use Pachisi\Field\StartStorageField;
 
 
 /**
@@ -52,14 +52,14 @@ class StartArea extends AreaAbstract {
     /**
      * @param Player $player
      *
-     * @return StartField[]
+     * @return StartStorageField[]
      */
     protected function _initFields(Player $player) {
         return array(
-            new StartField($player),
-            new StartField($player),
-            new StartField($player),
-            new StartField($player)
+            new StartStorageField($player),
+            new StartStorageField($player),
+            new StartStorageField($player),
+            new StartStorageField($player)
         );
     }
 

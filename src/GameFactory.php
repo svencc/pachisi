@@ -15,11 +15,15 @@ use Pachisi\Dice\SystemDice;
 use Pachisi\Strategy\StrategyComposite;
 use Pachisi\Strategy\SixOutStrategy;
 use Pachisi\Strategy\ClearStartFieldStrategy;
-use Pachisi\Strategy\BringManToTargetAreaStrategy;
+use Pachisi\Strategy\BringManInTargetAreaStrategy;
 use Pachisi\Strategy\GoOnWithManStrategy;
 
 class GameFactory {
 
+
+    /**
+     * @return GameController
+     */
     public static function setup4PlayersGame() {
 
         $game = new GameController();
@@ -51,10 +55,11 @@ class GameFactory {
         $strategies->combineStrategy(new ClearStartFieldStrategy());
         $strategies->combineStrategy(new SixOutStrategy());
         $strategies->combineStrategy(new ClearStartFieldStrategy());
-        $strategies->combineStrategy(new BringManToTargetAreaStrategy());
+        $strategies->combineStrategy(new BringManInTargetAreaStrategy());
         $strategies->combineStrategy(new GoOnWithManStrategy());
         $game->addStrategy($strategies);
 
+        return $game;
     }
 
 }

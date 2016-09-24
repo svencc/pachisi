@@ -4,9 +4,9 @@
     xsi:noNamespaceSchemaLocation="http://schema.phpunit.de/3.7/phpunit.xsd"
     cacheTokens="false"
     colors="false"
-    convertErrorsToExceptions="true"
-    convertNoticesToExceptions="true"
-    convertWarningsToExceptions="true"
+    convertErrorsToExceptions="false"
+    convertNoticesToExceptions="false"
+    convertWarningsToExceptions="false"
     forceCoversAnnotation="false"
     mapTestClassNameToCoveredClassName="true"
     printerClass="PHPUnit_TextUI_ResultPrinter"
@@ -20,24 +20,24 @@
     timeoutForMediumTests="10"
     timeoutForLargeTests="60"
     strict="false"
-    verbose="false">
+    verbose="true">
 
     <filter>
         <blacklist>
             <exclude>
-                <directory suffix=".php">tests/</directory>
-                <directory suffix=".php">vendor/</directory>
+                <directory suffix=".php">vendor\</directory>
+                <directory suffix=".php">tests\</directory>
             </exclude>
         </blacklist>
-        <whitelist processUncoveredFilesFromWhitelist="true">
-            <directory suffix=".php">src/</directory>
+        <whitelist>
+            <directory suffix=".php">src\</directory>
         </whitelist>
     </filter>
 
     <testsuites>
         <testsuite name="All">
-            <directory>tests/*Test.php files</directory>
-            <exclude>vendor/</exclude>
+            <directory>tests\*Test.php files</directory>
+            <exclude>vendor\</exclude>
         </testsuite>
     </testsuites>
 

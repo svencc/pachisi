@@ -9,6 +9,7 @@
 namespace Pachisi\Board;
 use Pachisi\Collection\PlayerCollection;
 use Pachisi\Field\PlayerRelatedField;
+use Pachisi\Man;
 use Pachisi\Player;
 
 use Pachisi\Field\FieldAbstract;
@@ -26,29 +27,119 @@ abstract class GameBoardAbstract {
      */
     protected $_circuitFieldList = array();
 
-    /** @var StartArea[]  */
+    /** @var StartArea[] */
     protected $_startAreasPerPlayer = array();
 
-    /** @var TargetArea[]  */
+    /** @var TargetArea[] */
     protected $_targetAreasPerPlayer = array();
 
     /**
      * GameBoardAbstract constructor.
      *
-     * @param   PlayerCollection    $players
+     * @param   PlayerCollection $collection
      */
     public function __construct(PlayerCollection $collection) {
         /** @var Player $player */
-        foreach($collection->iterateCollection() as $player) {
-            $this->_startAreasPerPlayer[$player->getUID()] = new StartArea($player);
-            foreach($player->getManList() as $man) {
-                $this->_startAreasPerPlayer[$player->getUID()]->resetManToStart($man);
+        foreach ($collection->iterateCollection() as $player) {
+            $this->_startAreasPerPlayer[$player->getPlayerIdentifier()] = new StartArea($player);
+            foreach ($player->getManList() as $man) {
+                $this->resetManToStart($man);
             }
-            $this->_targetAreasPerPlayer[$player->getUID()] = new TargetArea($player);
+            $this->_targetAreasPerPlayer[$player->getPlayerIdentifier()] = new TargetArea($player);
         }
 
         $this->_circuitFieldList = $this->_createCircuit($collection);
     }
+
+
+    public function canManBeMovedForward(Player $player, $numberOfDicePoints, Man $man) {
+        $fieldToMove = $this->getFieldToMove($player, $numberOfDicePoints, $man);
+        if ($fieldToMove instanceof FieldAbstract) {
+            return TRUE;
+        } else {
+            return FALSE;
+        }
+    }
+
+    /**
+     * Checks if the Player´s man is able to move forward $numberOfDicePoints
+     *
+     * @param Player $player
+     * @param        $numberOfDicePoints
+     * @param Man    $man
+     *
+     * @return bool|FieldAbstract
+     */
+    public function getFieldToMove(Player $player, $numberOfDicePoints, Man $man) {
+        $currentPosition = $man->getCurrentPosition();
+        $route = $this->drawPlayersRoute($player);
+
+        $remainingDicePoints = $numberOfDicePoints;
+        $manPositionFound = FALSE;
+        $endFieldOfMovement = NULL;
+        // Iterate over the hole route
+        foreach ($route as $field) {
+            // if the position of man was found we begin to count down the remaining dice points
+            if ($manPositionFound) {
+                $remainingDicePoints--;
+                // in case the remainingDicePoints are 9, we know that the movement stops on the route...
+                if ($remainingDicePoints == 0) {
+                    $endFieldOfMovement = $field;
+                    // ... and we stop the iteration here!
+                    break;
+                }
+            }
+            // if the currentPosition (of man) is equal with the current iterations field, we found the position on
+            // the route
+            if (spl_object_hash($field) == spl_object_hash($currentPosition)) {
+                $manPositionFound = TRUE;
+            }
+        }
+
+        // If the endFieldOfMovement is on the track, we have to check the track if there is another man ...
+        if ($endFieldOfMovement instanceof FieldAbstract) {
+            if ($endFieldOfMovement->hasMan()) {
+                $occupingMan = $endFieldOfMovement->getMan();
+                // .. if there is a man, we have to check if it belongs to our player or not ...
+                if ($occupingMan->getPlayerIdentifier() == $player->getPlayerIdentifier()) {
+                    // .. in case the man belongs to our player we are not able to move
+                    return FALSE;
+                } else {
+                    // .. in case the man belongs to an other player we are able to move
+                    return $endFieldOfMovement;
+                }
+                // if there is no man, we are able to move here in any case!
+            } else {
+                return $endFieldOfMovement;
+            }
+
+            // In case, the movement did not stop on the route, we have to check if we are allowed move into the TargetArea
+        } else {
+            $playersTargetArea = $this->_targetAreasPerPlayer[$player->getPlayerIdentifier()];
+            if ($playersTargetArea->isFieldAccessible($remainingDicePoints)) {
+                return $playersTargetArea->getField($remainingDicePoints);
+            }
+        }
+    }
+
+    public function moveToField(Player $player, FieldAbstract $fieldToMove, Man $man) {
+        $man->getCurrentPosition()->detachMan();
+        if($fieldToMove->hasMan()) {
+            $manToEliminate = $fieldToMove->getMan();
+            $fieldToMove->detachMan();
+            $this->resetManToStart($manToEliminate);
+        }
+        $fieldToMove->attachMan($man);
+    }
+
+    /**
+     * Template Method Pattern
+     *
+     * Forces to implement the number of fields per player in inhereted classes
+     *
+     * @return integer
+     */
+    abstract protected function _fieldsPerPlayer();
 
     /**
      * @param   PlayerCollection $collection
@@ -57,10 +148,10 @@ abstract class GameBoardAbstract {
      */
     protected function _createCircuit(PlayerCollection $collection) {
         /** @var FieldAbstract[] $circuitFields */
-        $circuitFields  = array();
-        $regularFields  = $this->_fieldsPerPlayer();
+        $circuitFields = array();
+        $regularFields = $this->_fieldsPerPlayer();
 
-        $playersInEndFieldOrder  = clone $collection;
+        $playersInEndFieldOrder = clone $collection;
         $playersInEndFieldOrder->leftShiftContent();
 
         foreach ($collection->iterateCollection() as $player) {
@@ -69,7 +160,7 @@ abstract class GameBoardAbstract {
             $circuitFields[] = new StartField($player);
 
             // ... than we add n fields till the next start field will be inserted
-            for($iteration=0; $iteration < $regularFields-2; $iteration++) {
+            for ($iteration = 0; $iteration < $regularFields - 2; $iteration++) {
                 $circuitFields[] = new RegularField($player);
             }
 
@@ -88,23 +179,23 @@ abstract class GameBoardAbstract {
      * @return PlayerRelatedField[]
      */
     public function drawPlayersRoute(Player $player) {
-        $line   = array();
-        $startFoundFlag = false;
+        $line = array();
+        $startFoundFlag = FALSE;
         /** @var FieldAbstract $field */
-        foreach($this->_itearateCircuit() as $field) {
+        foreach ($this->_itearateCircuit() as $field) {
 
             // First we look for the players start field
-            if($field instanceof StartField) {
-                if( $field->getRelatedPlayerIdentifier() == $player->getIdentifier() ) {
-                    $startFoundFlag = true;
+            if ($field instanceof StartField) {
+                if ($field->getRelatedPlayerIdentifier() == $player->getPlayerIdentifier()) {
+                    $startFoundFlag = TRUE;
                 }
             }
 
             // If we found the players start field, we track each field until we find his EndField
-            if($startFoundFlag) {
+            if ($startFoundFlag) {
                 $line[] = $field;
-                if($field instanceof EndField) {
-                    if( $field->getRelatedPlayerIdentifier() == $player->getIdentifier() ) {
+                if ($field instanceof EndField) {
+                    if ($field->getRelatedPlayerIdentifier() == $player->getPlayerIdentifier()) {
                         break;
                     }
                 }
@@ -114,12 +205,13 @@ abstract class GameBoardAbstract {
         return $line;
     }
 
+
     /**
      * @return \Generator
      */
     protected function _itearateCircuit() {
-        $circuitLength  = count($this->_circuitFieldList);
-        $iteration      = 0;
+        $circuitLength = count($this->_circuitFieldList);
+        $iteration = 0;
 
         do {
             yield $this->_circuitFieldList[$iteration];
@@ -127,15 +219,52 @@ abstract class GameBoardAbstract {
             if ($iteration == $circuitLength) {
                 $iteration = 0;
             }
-        } while(true);
+        } while (TRUE);
+    }
+
+
+    /**
+     * @param Player $player
+     *
+     * @return StartField
+     */
+    public function getPlayersStartField(Player $player) {
+        $route = $this->drawPlayersRoute($player);
+        return array_shift($route);
     }
 
     /**
-     * Template Method Pattern
+     * @param Player $player
      *
-     * Forces to implement the number of fields per player in inhereted classes
-     *
-     * @return integer
+     * @return EndField
      */
-    abstract protected function _fieldsPerPlayer();
+    public function getPlayersEndField(Player $player) {
+        $route = $this->drawPlayersRoute($player);
+        return array_pop($route);
+    }
+
+    /**
+     * @param Player $player
+     *
+     * @return StartArea
+     */
+    public function getPlayersStartArea(Player $player) {
+        return $this->_startAreasPerPlayer[$player->getPlayerIdentifier()];
+    }
+
+    /**
+     * @param Player $player
+     *
+     * @return StartArea
+     */
+    public function getPlayersTargetArea(Player $player) {
+        return $this->_targetAreasPerPlayer[$player->getPlayerIdentifier()];
+    }
+
+    /**
+     * @param $manToEliminate
+     */
+    public function resetManToStart(Man $manToEliminate) {
+        $this->_startAreasPerPlayer[$manToEliminate->getPlayerIdentifier()]->resetManToStart($manToEliminate);
+    }
 }
