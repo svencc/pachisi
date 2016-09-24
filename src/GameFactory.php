@@ -7,40 +7,53 @@
  */
 
 namespace Pachisi;
-use Pachisi\Game;
-use Pachisi\Player;
+//use Pachisi\Game;
+//use Pachisi\Player;
 use Pachisi\Board\FourPlayerGameBoard;
+use Pachisi\Collection\PlayerCollection;
+use Pachisi\Dice\SystemDice;
+use Pachisi\Strategy\StrategyComposite;
+use Pachisi\Strategy\SixOutStrategy;
+use Pachisi\Strategy\ClearStartFieldStrategy;
+use Pachisi\Strategy\BringManToTargetAreaStrategy;
+use Pachisi\Strategy\GoOnWithManStrategy;
 
 class GameFactory {
 
     public static function setup4PlayersGame() {
 
-        $game = new Game();
+        $game = new GameController();
 
         // We need a dice
-        $dice   = new Dice();
+        $dice   = new SystemDice();
         $game->addDice($dice);
 
         // We need 4 players ...
-        $player1    = new Player(GAME::PLAYER_ID_1);
-        $player2    = new Player(GAME::PLAYER_ID_2);
-        $player3    = new Player(GAME::PLAYER_ID_3);
-        $player4    = new Player(GAME::PLAYER_ID_4);
+        $player1    = new Player(GameController::PLAYER_ID_1);
+        $player2    = new Player(GameController::PLAYER_ID_2);
+        $player3    = new Player(GameController::PLAYER_ID_3);
+        $player4    = new Player(GameController::PLAYER_ID_4);
+
+        $playerCollection   = new PlayerCollection();
+        $playerCollection->addToCollection($player1);
+        $playerCollection->addToCollection($player2);
+        $playerCollection->addToCollection($player3);
+        $playerCollection->addToCollection($player4);
 
         // ... and add them to the game
-        $game->addPlayer($player1);
-        $game->addPlayer($player2);
-        $game->addPlayer($player3);
-        $game->addPlayer($player4);
-
-        // Each player needs to bring his 4 men to the game
-        $game->addMen($player1->getManList());
-        $game->addMen($player2->getManList());
-        $game->addMen($player3->getManList());
-        $game->addMen($player4->getManList());
+        $game->addPlayers($playerCollection);
 
         // We also need a game board
-        $gameBoard = new FourPlayerGameBoard();
+        $gameBoard = new FourPlayerGameBoard($playerCollection);
+        $game->addBoard($gameBoard);
+
+        $strategies = new StrategyComposite();
+        $strategies->combineStrategy(new ClearStartFieldStrategy());
+        $strategies->combineStrategy(new SixOutStrategy());
+        $strategies->combineStrategy(new ClearStartFieldStrategy());
+        $strategies->combineStrategy(new BringManToTargetAreaStrategy());
+        $strategies->combineStrategy(new GoOnWithManStrategy());
+        $game->addStrategy($strategies);
 
     }
 

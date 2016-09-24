@@ -5,6 +5,6 @@ require 'config.php';
 $loader = require __DIR__ . '/vendor/autoload.php';
 echo 'hallo';
 
-\Pachisi\GameBoardAbstract::bla();
-$test = new Pachisi\GameBoardAbstract();
-var_dump($test->hello() );
+//\Pachisi\GameBoardAbstract::bla();
+//$test = new Pachisi\Board\4();
+//var_dump($test->hello() );

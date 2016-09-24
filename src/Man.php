@@ -8,9 +8,11 @@
 
 namespace Pachisi;
 use \Pachisi\Field\FieldAbstract;
-use \Pachisi\Exception\UnallowedPlayerNumberException;
+use \Pachisi\Validator\Exception\OutOfRangeException;
+use \Pachisi\Validator\Validator;
+use \Pachisi\Collection\iCollectibleItem;
 
-class Man {
+class Man implements iCollectibleItem  {
 
     /**
      * @var FieldAbstract
@@ -31,32 +33,33 @@ class Man {
      * Man constructor.
      *
      * @param   string  $playerIdentifier   Defines to which player this man belongs
-     * @param   integer $tokenNumber        The mens number
-     * @throws  UnallowedPlayerNumberException
+     * @param   integer $tokenNumber        The man´s number
+     *
+     * @throws  OutOfRangeException
      */
     public function __construct($playerIdentifier, $tokenNumber) {
         $this->_playerIdentifier    = $playerIdentifier;
-        $this->_validateRange($tokenNumber);
+        Validator::_validateRange(0,3,$tokenNumber);
         $this->_tokenNumber         = $tokenNumber;
-    }
-
-    /**
-     * Checks if the given $tokenNumber is in range 0-3
-     *
-     * @param   integer $tokenNumber    The token number to validate
-     *
-     * @return  bool
-     * @throws  UnallowedPlayerNumberException
-     */
-    protected function _validateRange($tokenNumber) {
-        if($tokenNumber >= 0 && $tokenNumber <= 3) {
-            return true;
-        } else {
-            throw new UnallowedPlayerNumberException();
-        }
     }
 
     public function getManIdentifier() {
         return "{$this->_playerIdentifier}#{$this->_tokenNumber}";
+    }
+
+    public function getCurrentPosition() {
+        return $this->_currentPosition;
+    }
+
+    public function setCurrentPosition(FieldAbstract $newPosition) {
+        $this->_currentPosition = $newPosition;
+    }
+
+    public function removeCurrentPosition() {
+        $this->_currentPosition = null;
+    }
+
+    public function getUID() {
+        return $this->getManIdentifier();
     }
 }

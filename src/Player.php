@@ -7,14 +7,15 @@
  */
 
 namespace Pachisi;
+use Pachisi\Collection\Exception\RequestedItemNotFoundException;
+use Pachisi\Collection\iCollectibleItem;
+use Pachisi\Collection\ManCollection;
+use Pachisi\Field\StartField;
 
+class Player implements iCollectibleItem {
 
-class Player {
-
-    /**
-     * @var Man[]
-     */
-    protected $_manList = array();
+    /** @var  ManCollection */
+    protected $_manCollection;
 
     /**
      * @return mixed
@@ -23,8 +24,52 @@ class Player {
         return $this->_id;
     }
 
+    public function hasManOnBoard() {
+        /** @var Man $man */
+        foreach($this->_manCollection->iterateCollection() as $man) {
+            if($man->getCurrentPosition() === null || $man->getCurrentPosition() instanceof StartField) {
+                continue;
+            } else {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    public function hasManOnStartField() {
+        /** @var Man $man */
+        foreach($this->_manCollection->iterateCollection() as $man) {
+            if($man->getCurrentPosition() instanceof StartField) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    public function getManOnStartField() {
+        /** @var Man $man */
+        foreach($this->_manCollection->iterateCollection() as $man) {
+            if($man->getCurrentPosition() instanceof StartField) {
+                return $man;
+            }
+        }
+
+        throw new RequestedItemNotFoundException("There is no man on StartField!");
+    }
+
+//    public function getManCollection() {
+//        return $this->_manCollection;
+//    }
+
     public function getManList() {
-        return $this->_manList;
+        $list = array();
+        foreach($this->_manCollection->iterateCollection() as $man) {
+            $list[] = $man;
+        }
+
+        return $list;
     }
 
     /**
@@ -38,10 +83,18 @@ class Player {
     }
 
     protected function _initMen() {
-        $this->_manList[]   = new Man($this->_id, 0);
-        $this->_manList[]   = new Man($this->_id, 1);
-        $this->_manList[]   = new Man($this->_id, 2);
-        $this->_manList[]   = new Man($this->_id, 3);
+        $this->_manCollection = new ManCollection();
+        $this->_manCollection->addToCollection(new Man($this->_id, 0));
+        $this->_manCollection->addToCollection(new Man($this->_id, 1));
+        $this->_manCollection->addToCollection(new Man($this->_id, 2));
+        $this->_manCollection->addToCollection(new Man($this->_id, 3));
+    }
+
+    /**
+     * @return string
+     */
+    public function getUID() {
+        return $this->_id;
     }
 
 }
