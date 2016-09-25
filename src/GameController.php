@@ -11,6 +11,7 @@ namespace Pachisi;
 
 use Pachisi\Collection\PlayerCollection;
 use Pachisi\Dice\DiceAbstract;
+use Pachisi\Exception\PachisiException;
 use Pachisi\Logger\LoggerService;
 use Pachisi\Strategy\StrategyAbstract;
 
@@ -79,6 +80,7 @@ class GameController {
             LoggerService::logger()->info("Player '{$player->getPlayerIdentifier()}' rolled the dice a '{$numberOfDicePoints}'");
             $this->_strategy->play($player, $numberOfDicePoints, $this->_gameBoard);
 
+            throw new PachisiException('test 12');
             // PRÜFE SIEGBEDINGUNG
         }
 

@@ -4,8 +4,47 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "content-hash": "00f9eedb735c44c612a1a4ae6d18f403",
+    "content-hash": "3d40639fe50039711e76e6cc7d5894c7",
     "packages": [
+        {
+            "name": "defiant/randomorg",
+            "version": "dev-master",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/defiant/randomorg.git",
+                "reference": "7235bfe53bc08f07a85fbfcf3a9487d6e97c8b6f"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/defiant/randomorg/zipball/7235bfe53bc08f07a85fbfcf3a9487d6e97c8b6f",
+                "reference": "7235bfe53bc08f07a85fbfcf3a9487d6e97c8b6f",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.4.0"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "RandomOrg\\": "src/randomorg"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "authors": [
+                {
+                    "name": "Sinan Taga",
+                    "email": "sinantaga@gmail.com",
+                    "role": "Developer"
+                }
+            ],
+            "description": "PHP class for Random.org",
+            "homepage": "http://github.com/defiant/randomorg",
+            "keywords": [
+                "random",
+                "random.org"
+            ],
+            "time": "2016-07-13 21:16:00"
+        },
         {
             "name": "doctrine/instantiator",
             "version": "1.0.5",
@@ -1437,7 +1476,9 @@
     "packages-dev": [],
     "aliases": [],
     "minimum-stability": "stable",
-    "stability-flags": [],
+    "stability-flags": {
+        "defiant/randomorg": 20
+    },
     "prefer-stable": false,
     "prefer-lowest": false,
     "platform": [],

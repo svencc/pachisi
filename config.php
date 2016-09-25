@@ -1,9 +1,11 @@
 <?php
 
-// First, set error output ON
+// First, set error output ON, so we are able to see what happens via startup of application
 ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
+
+
 
 
 define('APP_ROOT', __DIR__);
@@ -12,12 +14,21 @@ define('LOCAL_CONF', APP_ROOT.DIRECTORY_SEPARATOR.'local_config.php');
 $LOG_FILE = APP_ROOT.DIRECTORY_SEPARATOR.'logs'.DIRECTORY_SEPARATOR.'game.log';
 $DEBUG_LOG_FILE = APP_ROOT.DIRECTORY_SEPARATOR.'logs'.DIRECTORY_SEPARATOR.'debug.log';
 $ERROR_LOG_FILE = APP_ROOT.DIRECTORY_SEPARATOR.'logs'.DIRECTORY_SEPARATOR.'error.log';
+
 $ERROR_VERBOSE = false;
+
+$USE_RANDOMORG_API = false;
+$RANDOMORG_API_KEY = '00000000-0000-0000-0000-000000000000';
 
 // Overwrite config with values from local_config; in case there is one
 if(is_file(LOCAL_CONF) && is_readable(LOCAL_CONF)) {
     require_once LOCAL_CONF;
 }
+
+
+
+
+
 
 define('LOG_FILE', $LOG_FILE);
 define('DEBUG_LOG_FILE', $DEBUG_LOG_FILE);

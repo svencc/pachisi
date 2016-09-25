@@ -39,5 +39,15 @@ abstract class LoggerServiceAbstract {
         return self::$_instance->_logger;
     }
 
+    public static function logException(\Exception $e) {
+        $exceptionType = get_class($e);
+        $message = "UNCATCHED EXCEPTION of type '{$exceptionType}'"
+        ." with MESSAGE: '{$e->getMessage()}'"
+        ." in FILE: '{$e->getFile()}'"
+        ." in LINE: '{$e->getLine()}"
+        ." occured!";
+        self::logger()->error($message, $e->getTrace());
+    }
+
     abstract public static function truncateLogs();
 }
