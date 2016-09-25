@@ -3,6 +3,8 @@
 namespace Pachisi\Strategy;
 use Pachisi\Player;
 use Pachisi\Board\GameBoardAbstract;
+use Pachisi\Strategy\Status\EndPlayersTurnStatus;
+
 /**
  * Created by PhpStorm.
  * User: carri_000
@@ -20,9 +22,22 @@ class StrategyComposite extends StrategyAbstract  {
         $this->_strategies[] = $strategy;
     }
 
+    /**
+     * @param Player            $player
+     * @param                   $numberOfDicePoints
+     * @param GameBoardAbstract $board
+     *
+     * @return Status\StatusAbstract
+     */
     protected function _applyStrategy(Player $player, $numberOfDicePoints, GameBoardAbstract $board) {
         foreach($this->_strategies as $strategy) {
-            $strategy->play($player, $numberOfDicePoints, $board);
+            $status = $strategy->play($player, $numberOfDicePoints, $board);
+
+            if($status instanceof EndPlayersTurnStatus) {
+                return $status;
+            } else {
+                continue;
+            }
         }
     }
 

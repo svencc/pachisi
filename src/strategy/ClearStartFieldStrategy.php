@@ -14,11 +14,16 @@ class ClearStartFieldStrategy extends StrategyAbstract {
     protected function _applyStrategy(Player $player, $numberOfDicePoints, GameBoardAbstract $board) {
         if($player->hasManOnBoard()) {
             if($player->hasManOnStartField()) {
+                $this->logStrategyDebug('Player has man on start field.');
                 $man = $player->getManOnStartField();
 
                 if($board->canManBeMovedForward($player, $numberOfDicePoints, $man)) {
+                    $this->logStrategyDebug('Man on start field can be moved');
                     $fieldToMove = $board->getFieldToMove($player, $numberOfDicePoints, $man);
                     $board->moveToField($player, $fieldToMove, $man);
+                    $this->logStrategyInfo("{$man->getManIdentifier()} moved $numberOfDicePoints fields forward");
+                } else {
+                    $this->logStrategyDebug("Man on start field can´t be moved {$numberOfDicePoints} fields forward.");
                 }
             }
         }

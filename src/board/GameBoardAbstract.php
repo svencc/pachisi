@@ -19,6 +19,7 @@ use Pachisi\Field\EndField;
 
 use Pachisi\Area\StartArea;
 use Pachisi\Area\TargetArea;
+use Pachisi\Logger\LoggerService;
 
 abstract class GameBoardAbstract {
 
@@ -266,5 +267,6 @@ abstract class GameBoardAbstract {
      */
     public function resetManToStart(Man $manToEliminate) {
         $this->_startAreasPerPlayer[$manToEliminate->getPlayerIdentifier()]->resetManToStart($manToEliminate);
+        LoggerService::logger()->info("KICK OUT :{$manToEliminate->getManIdentifier()}!");
     }
 }

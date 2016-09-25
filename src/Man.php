@@ -10,7 +10,7 @@ namespace Pachisi;
 use Pachisi\Board\GameBoardAbstract;
 use \Pachisi\Field\FieldAbstract;
 use \Pachisi\Validator\Exception\OutOfRangeException;
-use \Pachisi\Validator\Validator;
+use \Pachisi\Validator\ValidatorService;
 use \Pachisi\Collection\iCollectibleItem;
 
 class Man implements iCollectibleItem  {
@@ -40,7 +40,7 @@ class Man implements iCollectibleItem  {
      */
     public function __construct($playerIdentifier, $tokenNumber) {
         $this->_playerIdentifier    = $playerIdentifier;
-        Validator::_validateRange(0,3,$tokenNumber);
+        ValidatorService::_validateRange(0,3,$tokenNumber);
         $this->_tokenNumber         = $tokenNumber;
     }
 

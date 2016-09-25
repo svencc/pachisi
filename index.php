@@ -1,8 +1,12 @@
 <?php
+require __DIR__ . '/vendor/autoload.php';
 require 'config.php';
-$loader = require __DIR__ . '/vendor/autoload.php';
 
-new \Pachisi\GameController();
+$handler = new \Pachisi\Error\ErrorToExtepctionHandler();
+$handler->registerHandler();
+$handler->setLoggerServiceName('\Pachisi\Logger\LoggerService');
+
+trigger_error('svens test');
 
 $game = \Pachisi\GameFactory::setup4PlayersGame();
 $game->runGame();

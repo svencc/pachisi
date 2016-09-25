@@ -9,12 +9,12 @@
 namespace Pachisi\Area;
 use Pachisi\Player;
 use Pachisi\Field\TargetField;
-use Pachisi\Validator\Validator;
+use Pachisi\Validator\ValidatorService;
 
 class TargetArea extends AreaAbstract {
 
     public function isFieldEmpty($fieldNr) {
-        Validator::_validateRange(1,4,$fieldNr);
+        ValidatorService::_validateRange(1,4,$fieldNr);
 
         return !$this->_fieldList[$fieldNr-1]->hasMan();
     }
@@ -25,7 +25,7 @@ class TargetArea extends AreaAbstract {
 
     public function isFieldAccessible($fieldNr) {
         try {
-            Validator::_validateRange(1,4,$fieldNr);
+            ValidatorService::_validateRange(1,4,$fieldNr);
         } catch (OutOfRangeException $oore) {
             return false;
         }

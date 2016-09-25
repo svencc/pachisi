@@ -9,7 +9,7 @@
 namespace Pachisi\Validator;
 use \Pachisi\Validator\Exception\OutOfRangeException;
 
-abstract class Validator {
+abstract class ValidatorService {
 
     /**
      * Checks if the given $numberToValidate is in range between $min and $max

@@ -7,11 +7,13 @@
  */
 
 namespace Pachisi;
+use Monolog\Logger;
 use Pachisi\Collection\Exception\RequestedItemNotFoundException;
 use Pachisi\Collection\iCollectibleItem;
 use Pachisi\Collection\ManCollection;
 use Pachisi\Field\StartStorageField;
 use Pachisi\Field\StartField;
+use Pachisi\Logger\LoggerService;
 
 class Player implements iCollectibleItem {
 
@@ -40,7 +42,6 @@ class Player implements iCollectibleItem {
     public function hasManOnBoard() {
         /** @var Man $man */
         foreach($this->_manCollection->iterateCollection() as $man) {
-            var_dump($man->getCurrentPosition());
             if( $man->getCurrentPosition() === null || $man->getCurrentPosition() instanceof StartStorageField ) {
                 continue;
             } else {
@@ -68,10 +69,12 @@ class Player implements iCollectibleItem {
     /**
      * @return bool
      */
-    public function hasManInStartArea() {
+    public function hasFreeManInStartArea() {
+        LoggerService::logger()->debug("hasFreeManInStartArea?");
         /** @var Man $man */
         foreach($this->_manCollection->iterateCollection() as $man) {
             if($man->getCurrentPosition() instanceof StartStorageField) {
+                LoggerService::logger()->debug("{$man->getManIdentifier()} -> ".get_class($man->getCurrentPosition()));
                 return true;
             }
         }

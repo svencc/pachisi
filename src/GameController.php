@@ -11,6 +11,7 @@ namespace Pachisi;
 
 use Pachisi\Collection\PlayerCollection;
 use Pachisi\Dice\DiceAbstract;
+use Pachisi\Logger\LoggerService;
 use Pachisi\Strategy\StrategyAbstract;
 
 class GameController {
@@ -63,15 +64,19 @@ class GameController {
 
 
     public function runGame() {
+        $roundNr = 1;
+        LoggerService::logger()->info('Start game');
         do {
-            $victory = $this->playRound();
+            $victory = $this->playRound($roundNr);
+            $roundNr++;
         } while($victory == false);
     }
 
-    protected function playRound() {
-        var_dump('next round');
+    protected function playRound($roundNr) {
+        LoggerService::logger()->info("Start new game round {$roundNr}");
         foreach($this->_playerList as $player) {
             $numberOfDicePoints = $this->_dice->rollDice();
+            LoggerService::logger()->info("Player '{$player->getPlayerIdentifier()}' rolled the dice a '{$numberOfDicePoints}'");
             $this->_strategy->play($player, $numberOfDicePoints, $this->_gameBoard);
 
             // PRÜFE SIEGBEDINGUNG
