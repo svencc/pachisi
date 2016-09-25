@@ -8,12 +8,14 @@
 
 namespace Pachisi\Board;
 use Pachisi\Collection\PlayerCollection;
-use Pachisi\Field\PlayerRelatedField;
+use Pachisi\Field\Exception\FieldIsNotEmptyException;
+use Pachisi\Field\StartAreaField;
+use Pachisi\Field\TargetAreaField;
 use Pachisi\Man;
 use Pachisi\Player;
 
 use Pachisi\Field\FieldAbstract;
-use Pachisi\Field\RegularField;
+use Pachisi\Field\RegularMovementField;
 use Pachisi\Field\StartField;
 use Pachisi\Field\EndField;
 
@@ -53,7 +55,7 @@ abstract class GameBoardAbstract {
     }
 
 
-    public function canManBeMovedForward(Player $player, $numberOfDicePoints, Man $man) {
+    public function isManMovableForward(Player $player, $numberOfDicePoints, Man $man) {
         $fieldToMove = $this->getFieldToMove($player, $numberOfDicePoints, $man);
         if ($fieldToMove instanceof FieldAbstract) {
             return TRUE;
@@ -116,14 +118,21 @@ abstract class GameBoardAbstract {
 
             // In case, the movement did not stop on the route, we have to check if we are allowed move into the TargetArea
         } else {
-            $playersTargetArea = $this->_targetAreasPerPlayer[$player->getPlayerIdentifier()];
-            if ($playersTargetArea->isFieldAccessible($remainingDicePoints)) {
+            $playersTargetArea = $this->getPlayersTargetArea($player);
+//            var_dump($playersTargetArea);
+            if ($playersTargetArea->isFieldAccessible($currentPosition, $remainingDicePoints)) {
                 return $playersTargetArea->getField($remainingDicePoints);
             }
         }
     }
 
     public function moveToField(Player $player, FieldAbstract $fieldToMove, Man $man) {
+        if($fieldToMove->hasMan()) {
+            if ($man->getPlayerIdentifier() == $fieldToMove->getMan()->getPlayerIdentifier()) {
+                throw new FieldIsNotEmptyException('On the given field is a man of the same player!');
+            }
+        }
+
         $man->getCurrentPosition()->detachMan();
         if($fieldToMove->hasMan()) {
             $manToEliminate = $fieldToMove->getMan();
@@ -155,18 +164,21 @@ abstract class GameBoardAbstract {
         $playersInEndFieldOrder = clone $collection;
         $playersInEndFieldOrder->leftShiftContent();
 
+        $fieldNr = 0;
         foreach ($collection->iterateCollection() as $player) {
 
             // We begin with creating the StartField ...
-            $circuitFields[] = new StartField($player);
+            $circuitFields[] = new StartField($player, $fieldNr);
 
             // ... than we add n fields till the next start field will be inserted
             for ($iteration = 0; $iteration < $regularFields - 2; $iteration++) {
-                $circuitFields[] = new RegularField($player);
+                $fieldNr++;
+                $circuitFields[] = new RegularMovementField($fieldNr);
             }
-
+            $fieldNr++;
             // We finish the iteration with creating the EndField for the player before...
-            $circuitFields[] = new EndField($playersInEndFieldOrder->shiftFirstItemFromCollection());
+            $circuitFields[] = new EndField($playersInEndFieldOrder->shiftFirstItemFromCollection() ,$fieldNr);
+            $fieldNr++;
         }
 
         return $circuitFields;
@@ -177,7 +189,7 @@ abstract class GameBoardAbstract {
      *
      * @param Player $player The player which should be used to generate his personal route
      *
-     * @return PlayerRelatedField[]
+     * @return FieldAbstract[]
      */
     public function drawPlayersRoute(Player $player) {
         $line = array();
@@ -206,12 +218,30 @@ abstract class GameBoardAbstract {
         return $line;
     }
 
+    /**
+     * @param Player $player
+     *
+     * @return Man[]
+     */
+    public function getPlayersManWithAscendingDistanzToEndField(Player $player) {
+        $orderedManList = array();
+        $route = $this->drawPlayersRoute($player);
+        /** @var FieldAbstract[] $reverseRoute */
+        $reverseRoute = array_reverse ($route);
+        foreach($reverseRoute as $field) {
+            if($field->hasMan() && $field->getMan()->getPlayerIdentifier() == $player->getPlayerIdentifier()) {
+                $orderedManList[] = $field->getMan();
+            }
+        }
+
+        return $orderedManList;
+    }
 
     /**
-     * @return \Generator
+     * @return \Generator[FieldAbstract]
      */
-    protected function _itearateCircuit() {
-        $circuitLength = count($this->_circuitFieldList);
+    public function _itearateCircuit() {
+        $circuitLength = $this->getCircuitLength();
         $iteration = 0;
 
         do {
@@ -245,12 +275,40 @@ abstract class GameBoardAbstract {
     }
 
     /**
-     * @param Player $player
+     * @param Player|string $player
      *
      * @return StartArea
      */
-    public function getPlayersStartArea(Player $player) {
-        return $this->_startAreasPerPlayer[$player->getPlayerIdentifier()];
+    public function getPlayersStartArea($player) {
+        if($player instanceof Player) {
+            $playerIdentifier = $player->getPlayerIdentifier();
+        } else {
+            $playerIdentifier = $player;
+        }
+        return $this->_startAreasPerPlayer[$playerIdentifier];
+    }
+
+    /**
+     * @param Player|string $player
+     *
+     * @return TargetArea
+     */
+    public function getPlayersTargetArea(Player $player) {
+        if($player instanceof Player) {
+            $playerIdentifier = $player->getPlayerIdentifier();
+        } else {
+            $playerIdentifier = $player;
+        }
+        return $this->_targetAreasPerPlayer[$playerIdentifier];
+    }
+
+    /**
+     * @param Player $player
+     *
+     * @return TargetArea
+     */
+    public function appendToPlayersTargetArea(Player $player, TargetAreaField $targetAreaField) {
+        return $this->_targetAreasPerPlayer[$player->getPlayerIdentifier()] = $targetAreaField;
     }
 
     /**
@@ -258,15 +316,25 @@ abstract class GameBoardAbstract {
      *
      * @return StartArea
      */
-    public function getPlayersTargetArea(Player $player) {
-        return $this->_targetAreasPerPlayer[$player->getPlayerIdentifier()];
+    public function appendToPlayersStartArea(Player $player, StartAreaField $startAreaField) {
+        return $this->_startAreasPerPlayer[$player->getPlayerIdentifier()] = $startAreaField;
     }
 
     /**
      * @param $manToEliminate
      */
     public function resetManToStart(Man $manToEliminate) {
-        $this->_startAreasPerPlayer[$manToEliminate->getPlayerIdentifier()]->resetManToStart($manToEliminate);
+        $startArea = $this->getPlayersStartArea($manToEliminate->getPlayerIdentifier());
+        $startArea->resetManToStart($manToEliminate);
         LoggerService::logger()->info("KICK OUT :{$manToEliminate->getManIdentifier()}!");
+    }
+
+    /**
+     * @return int
+     */
+    public function getCircuitLength() {
+        $circuitLength = count($this->_circuitFieldList);
+
+        return $circuitLength;
     }
 }

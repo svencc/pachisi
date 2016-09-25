@@ -8,18 +8,18 @@
  */
 
 namespace Pachisi\Field;
-use Pachisi\Field\RegularFieldAbstract;
 use Pachisi\Player;
 
-class PlayerRelatedField extends RegularField  {
+abstract class PlayerRelatedField extends RegularMovementField  {
 
     /**
      * @var string  The playerIdentifier this field belongs to
      */
     protected $_relatedPlayerIdentifier;
 
-    public function __construct(Player $player) {
+    public function __construct(Player $player, $fieldNr) {
         $this->_relatedPlayerIdentifier = $player->getPlayerIdentifier();
+        parent::__construct($fieldNr);
     }
 
     /**

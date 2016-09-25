@@ -10,9 +10,8 @@ namespace Pachisi\Logger;
 
 
 use Monolog\Logger;
-use Monolog\Handler\StreamHandler;
 
-abstract class LoggerServiceAbstract {
+abstract class LoggerServiceAbstract implements iLoggerProvider {
 
     protected static $_instance = NULL;
 
@@ -50,4 +49,8 @@ abstract class LoggerServiceAbstract {
     }
 
     abstract public static function truncateLogs();
+
+    abstract public static function registerNewServiceConsumer(iLoggerConsumer $consumer);
+
+
 }

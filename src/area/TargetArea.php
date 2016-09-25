@@ -7,15 +7,18 @@
  */
 
 namespace Pachisi\Area;
+use Pachisi\Area\Exception\AreaIsEmptyException;
+use Pachisi\Field\FieldAbstract;
+use Pachisi\Man;
 use Pachisi\Player;
-use Pachisi\Field\TargetField;
+use Pachisi\Field\TargetAreaField;
 use Pachisi\Validator\ValidatorService;
+use \Pachisi\Validator\Exception\OutOfRangeException;
 
 class TargetArea extends AreaAbstract {
 
     public function isFieldEmpty($fieldNr) {
         ValidatorService::_validateRange(1,4,$fieldNr);
-
         return !$this->_fieldList[$fieldNr-1]->hasMan();
     }
 
@@ -23,37 +26,73 @@ class TargetArea extends AreaAbstract {
         return $this->_fieldList[$fieldNr-1];
     }
 
-    public function isFieldAccessible($fieldNr) {
+//todo: unit test
+    /**
+     * @return Man[]
+     * @throws AreaIsEmptyException
+     */
+    public function getManListFirstToLast(){
+        /** @var Man[] $orderedList */
+        $orderedList = array();
+        for($iteration=3; $iteration>=0;$iteration--) {
+            if ($this->_fieldList[$iteration]->hasMan()) {
+                $orderedList[] = $this->_fieldList[$iteration]->getMan();
+            }
+        }
+
+        return $orderedList;
+    }
+
+    public function isFieldAccessible(FieldAbstract $fromField, $targetFieldNr) {
         try {
-            ValidatorService::_validateRange(1,4,$fieldNr);
+            ValidatorService::_validateRange(1,4,$targetFieldNr);
         } catch (OutOfRangeException $oore) {
             return false;
         }
 
-        $fieldIndexToCheck = $fieldNr-1;
-
-        foreach($this->_fieldList as $index => $field) {
-            if($index == ($fieldIndexToCheck)) {
-                break;
-            }
-
-            if ($field->hasMan()) {
+        if($fromField instanceof TargetAreaField) {
+            $fromFieldNr = $fromField->getFieldNr();
+            $fieldToCheck = $fromFieldNr+1;
+            if($fieldToCheck > $targetFieldNr) {
                 return false;
             }
-        }
+            for($fieldToCheck; $fieldToCheck<=$targetFieldNr; $fieldToCheck++) {
+                if(!$this->isFieldEmpty($fieldToCheck)) {
+                    return false;
+                }
+            }
 
-        return !$this->_fieldList[$fieldIndexToCheck]->hasMan();
+            return true;
+
+        } else {
+            $fromFieldNr = 0;
+            $fieldToCheck = $fromFieldNr+1;
+            if($fieldToCheck > $targetFieldNr) {
+                return false;
+            }
+            for($fieldToCheck; $fieldToCheck<=$targetFieldNr; $fieldToCheck++) {
+                if(!$this->isFieldEmpty($fieldToCheck)) {
+                    return false;
+                }
+            }
+
+            return true;
+        }
     }
 
-    public function attachMan($fieldNr, $man) {
-        if($this->isFieldAccessible($fieldNr)) {
+    /**
+     * @param $fieldNr
+     * @param Man $man
+     */
+    public function attachMan($fieldNr, Man $man) {
+        if($this->isFieldEmpty($fieldNr)) {
             $fieldNr-1;
             $this->_fieldList[$fieldNr-1]->attachMan($man);
         }
     }
 
     public function detachMan($fieldNr, $man) {
-        if($this->isFieldAccessible($fieldNr)) {
+        if($this->isFieldEmpty($fieldNr-1)) {
             return $this->_fieldList[$fieldNr-1]->detachMan($man);
         }
     }
@@ -61,14 +100,14 @@ class TargetArea extends AreaAbstract {
     /**
      * @param Player $player
      *
-     * @return TargetField[]
+     * @return TargetAreaField[]
      */
     protected function _initFields(Player $player) {
         return array(
-            new TargetField($player),
-            new TargetField($player),
-            new TargetField($player),
-            new TargetField($player),
+            new TargetAreaField($player,1),
+            new TargetAreaField($player,2),
+            new TargetAreaField($player,3),
+            new TargetAreaField($player,4),
         );
     }
 

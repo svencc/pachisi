@@ -24,6 +24,9 @@ class ErrorToExtepctionHandler extends ErrorHandlerAbstract{
      * @throws ErrorException
      */
     public function _handle($errno, $errstr, $errfile,  $errline, $errcontext) {
+        if(!is_array($errcontext)) {
+            $errcontext = get_object_vars($errcontext);
+        }
         throw new ErrorException(
             $errstr,
             $errno,

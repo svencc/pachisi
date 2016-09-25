@@ -3,15 +3,19 @@
 namespace Pachisi\Strategy;
 use Pachisi\Player;
 use Pachisi\Board\GameBoardAbstract;
+use Pachisi\Strategy\Status\EndPlayersTurnStatus;
+
 /**
  * Created by PhpStorm.
  * User: carri_000
  * Date: 23.09.2016
  * Time: 21:25
  */
-class GoOnWithManStrategy extends StrategyAbstract {
+class EndTurnStrategy extends StrategyAbstract {
 
     protected function _applyStrategy(Player $player, $numberOfDicePoints, GameBoardAbstract $board) {
-        // TODO: Implement _applyStrategy() method.
+        return new EndPlayersTurnStatus();
     }
+
+
 }

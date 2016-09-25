@@ -8,6 +8,7 @@
 
 namespace Pachisi\Validator;
 use \Pachisi\Validator\Exception\OutOfRangeException;
+use \Pachisi\Logger\LoggerService;
 
 abstract class ValidatorService {
 
@@ -22,6 +23,7 @@ abstract class ValidatorService {
      * @throws  OutOfRangeException
      */
     public static function _validateRange($min, $max, $numberToValidate) {
+        LoggerService::logger()->debug("_validateRange: {$min} | {$max} | {$numberToValidate}");
         if($numberToValidate >= $min && $numberToValidate <= $max) {
             return true;
         } else {

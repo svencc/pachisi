@@ -14,6 +14,8 @@ use Monolog\Handler\StreamHandler;
 
 class LoggerService extends LoggerServiceAbstract  {
 
+    const SERVICE_NAME = '\\Pachisi\\Logger\\LoggerService';
+
     /**
      * @return Logger
      */
@@ -34,4 +36,7 @@ class LoggerService extends LoggerServiceAbstract  {
         fclose($errorLog);
     }
 
+    public static function registerNewServiceConsumer(iLoggerConsumer $consumer) {
+        $consumer->setLoggerServiceName(LoggerService::SERVICE_NAME);
+    }
 }

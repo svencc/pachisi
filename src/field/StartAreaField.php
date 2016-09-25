@@ -8,8 +8,7 @@
  */
 
 namespace Pachisi\Field;
-use Pachisi\Field\RegularFieldAbstract;
 
-class StartStorageField extends PlayerRelatedField  {
+class StartAreaField extends PlayerRelatedField  {
 
 }

@@ -1,10 +1,11 @@
 <?php
-require __DIR__ . '/vendor/autoload.php';
-require 'config.php';
+require 'bootstrap.php';
 
 $handler = new \Pachisi\Error\ErrorToExtepctionHandler();
 $handler->registerHandler();
-$handler->setLoggerServiceName('\Pachisi\Logger\LoggerService');
+//$handler->setLoggerServiceName('\Pachisi\Logger\LoggerService');
+
+\Pachisi\Logger\LoggerService::registerNewServiceConsumer($handler);
 
 //trigger_error('svens test');
 

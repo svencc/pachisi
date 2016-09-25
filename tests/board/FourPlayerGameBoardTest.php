@@ -2,28 +2,34 @@
 use PHPUnit\Framework\TestCase;
 use \Pachisi\Collection\PlayerCollection;
 use \Pachisi\Board\FourPlayerGameBoard;
-use \Pachisi\GameController;
+use \Pachisi\GameEngine;
 use \Pachisi\Area\StartArea;
 use \Pachisi\Area\TargetArea;
 use \Pachisi\Field\StartField;
-use \Pachisi\Field\StartStorageField;
+use \Pachisi\Field\StartAreaField;
 use \Pachisi\Man;
+use \Pachisi\Player;
 
 //require_once '../../config.php';
 class FourPlayerGameBoardTest extends TestCase {
 
+    /** @var  Player */
     protected $_player1;
+    /** @var  Player */
     protected $_player2;
+    /** @var  Player */
     protected $_player3;
+    /** @var  Player */
     protected $_player4;
+    /** @var  PlayerCollection */
     protected $_playerCollection;
 
     public function setUp() {
         // We need 4 players ...
-        $this->_player1 = new \Pachisi\Player(\Pachisi\GameController::PLAYER_ID_1);
-        $this->_player2 = new \Pachisi\Player(\Pachisi\GameController::PLAYER_ID_2);
-        $this->_player3 = new \Pachisi\Player(\Pachisi\GameController::PLAYER_ID_3);
-        $this->_player4 = new \Pachisi\Player(\Pachisi\GameController::PLAYER_ID_4);
+        $this->_player1 = new \Pachisi\Player(\Pachisi\GameEngine::PLAYER_ID_1);
+        $this->_player2 = new \Pachisi\Player(\Pachisi\GameEngine::PLAYER_ID_2);
+        $this->_player3 = new \Pachisi\Player(\Pachisi\GameEngine::PLAYER_ID_3);
+        $this->_player4 = new \Pachisi\Player(\Pachisi\GameEngine::PLAYER_ID_4);
 
         $this->_playerCollection = new PlayerCollection();
         $this->_playerCollection->addToCollection($this->_player1);
@@ -40,7 +46,7 @@ class FourPlayerGameBoardTest extends TestCase {
         $this->assertTrue(count($board->_startAreasPerPlayer) == 4);
         $this->assertTrue(count($board->_targetAreasPerPlayer) == 4);
 
-        $expectedIndizes = array(GameController::PLAYER_ID_1,GameController::PLAYER_ID_2,GameController::PLAYER_ID_3,GameController::PLAYER_ID_4);
+        $expectedIndizes = array(GameEngine::PLAYER_ID_1,GameEngine::PLAYER_ID_2,GameEngine::PLAYER_ID_3,GameEngine::PLAYER_ID_4);
         foreach($board->_startAreasPerPlayer as $index => $area) {
             $this->assertTrue(in_array($index, $expectedIndizes));
             $this->assertTrue($area instanceof StartArea);
@@ -95,16 +101,16 @@ class FourPlayerGameBoardTest extends TestCase {
         $route2[38]->attachMan($player2_man3);
 
 
-        $this->assertFalse($board->canManBeMovedForward($this->_player2,2,$player2_man0));
-        $this->assertTrue($board->canManBeMovedForward($this->_player2,1,$player2_man0));
-        $this->assertTrue($board->canManBeMovedForward($this->_player2,3,$player2_man0));
+        $this->assertFalse($board->isManMovableForward($this->_player2,2,$player2_man0));
+        $this->assertTrue($board->isManMovableForward($this->_player2,1,$player2_man0));
+        $this->assertTrue($board->isManMovableForward($this->_player2,3,$player2_man0));
 
-        $this->assertTrue($board->canManBeMovedForward($this->_player2,3,$player2_man3));
+        $this->assertTrue($board->isManMovableForward($this->_player2,3,$player2_man3));
 
 
         $board->_targetAreasPerPlayer[$this->_player2->getPlayerIdentifier()]->attachMan(3, $player2_man0);
-        $this->assertTrue($board->canManBeMovedForward($this->_player2,3,$player2_man3));
-        $this->assertFalse($board->canManBeMovedForward($this->_player2,4,$player2_man3));
+        $this->assertTrue($board->isManMovableForward($this->_player2,3,$player2_man3));
+        $this->assertFalse($board->isManMovableForward($this->_player2,4,$player2_man3));
     }
 
     public function testResetManToStart() {
@@ -117,7 +123,7 @@ class FourPlayerGameBoardTest extends TestCase {
         $this->assertTrue($freeMan->getCurrentPosition() instanceof StartField);
         $board->resetManToStart($freeMan);
 
-        $this->assertTrue($freeMan->getCurrentPosition() instanceof StartStorageField);
+        $this->assertTrue($freeMan->getCurrentPosition() instanceof StartAreaField);
     }
 }
 

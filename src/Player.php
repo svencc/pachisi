@@ -7,13 +7,14 @@
  */
 
 namespace Pachisi;
-use Monolog\Logger;
 use Pachisi\Collection\Exception\RequestedItemNotFoundException;
 use Pachisi\Collection\iCollectibleItem;
 use Pachisi\Collection\ManCollection;
-use Pachisi\Field\StartStorageField;
+use Pachisi\Field\EndField;
+use Pachisi\Field\RegularMovementField;
+use Pachisi\Field\StartAreaField;
 use Pachisi\Field\StartField;
-use Pachisi\Logger\LoggerService;
+use Pachisi\Field\TargetAreaField;
 
 class Player implements iCollectibleItem {
 
@@ -42,10 +43,13 @@ class Player implements iCollectibleItem {
     public function hasManOnBoard() {
         /** @var Man $man */
         foreach($this->_manCollection->iterateCollection() as $man) {
-            if( $man->getCurrentPosition() === null || $man->getCurrentPosition() instanceof StartStorageField ) {
-                continue;
-            } else {
+            if( $man->getCurrentPosition() instanceof RegularMovementField ||
+                $man->getCurrentPosition() instanceof StartField ||
+                $man->getCurrentPosition() instanceof EndField
+            ) {
                 return true;
+            } else {
+                continue;
             }
         }
 
@@ -69,12 +73,24 @@ class Player implements iCollectibleItem {
     /**
      * @return bool
      */
-    public function hasFreeManInStartArea() {
-        LoggerService::logger()->debug("hasFreeManInStartArea?");
+    public function hasManInStartArea() {
         /** @var Man $man */
         foreach($this->_manCollection->iterateCollection() as $man) {
-            if($man->getCurrentPosition() instanceof StartStorageField) {
-                LoggerService::logger()->debug("{$man->getManIdentifier()} -> ".get_class($man->getCurrentPosition()));
+            if($man->getCurrentPosition() instanceof StartAreaField) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * @return bool
+     */
+    public function hasManInTargetArea() {
+        /** @var Man $man */
+        foreach($this->_manCollection->iterateCollection() as $man) {
+            if($man->getCurrentPosition() instanceof TargetAreaField) {
                 return true;
             }
         }
@@ -99,6 +115,21 @@ class Player implements iCollectibleItem {
     }
 
     /**
+     * @return Man
+     * @throws RequestedItemNotFoundException
+     */
+    public function getOneManFromStartAreaField() {
+        /** @var Man $man */
+        foreach($this->_manCollection->iterateCollection() as $man) {
+            if($man->getCurrentPosition() instanceof StartAreaField) {
+                return $man;
+            }
+        }
+
+        throw new RequestedItemNotFoundException("There is no man on StartAreaField!");
+    }
+
+    /**
      * @return Man[]
      */
     public function getManList() {
@@ -109,7 +140,6 @@ class Player implements iCollectibleItem {
 
         return $list;
     }
-
 
     protected function _initMen() {
         $this->_manCollection = new ManCollection();
@@ -124,6 +154,24 @@ class Player implements iCollectibleItem {
      */
     public function getUID() {
         return $this->playerIdentifier;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isVictorious() {
+        $manOnTargetAreaFields = array();
+        foreach($this->_manCollection->iterateCollection() as $man) {
+            if($man->getCurrentPosition() instanceof TargetAreaField) {
+                $manOnTargetAreaFields[] = $man;
+            }
+        }
+
+        if(count($manOnTargetAreaFields) == 4) {
+            return true;
+        } else {
+            return false;
+        }
     }
 
 }

@@ -21,6 +21,13 @@ abstract class AreaAbstract {
     /** @var FieldAbstract[]  */
     protected $_fieldList = array();
 
+    /**
+     * @return \Pachisi\Field\FieldAbstract[]
+     */
+    public function getFieldList() {
+        return $this->_fieldList;
+    }
+
     public function __construct(Player $player) {
         $this->_playerIdentifier = $player->getUID();
         $this->_fieldList = $this->_initFields($player);

@@ -12,6 +12,9 @@ use Pachisi\Board\GameBoardAbstract;
 class BringManInTargetAreaStrategy extends StrategyAbstract {
 
     protected function _applyStrategy(Player $player, $numberOfDicePoints, GameBoardAbstract $board) {
+        if($player->hasManOnBoard()) {
+
+        }
         // TODO: Implement _applyStrategy() method.
     }
 }

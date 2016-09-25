@@ -29,7 +29,7 @@ abstract class StrategyAbstract {
      * @param                   $numberOfDicePoints
      * @param GameBoardAbstract $board
      *
-     * @return \Pachisi\Strategy\Status\StatusAbstract
+     * @return \Pachisi\Strategy\Status\StatusAbstract|null
      */
     abstract protected function _applyStrategy(Player $player, $numberOfDicePoints, GameBoardAbstract $board);
 

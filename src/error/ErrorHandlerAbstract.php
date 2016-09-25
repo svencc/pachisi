@@ -7,12 +7,12 @@
  */
 
 namespace Pachisi\Error;
-use Pachisi\Exception\ErrorException;
+use Pachisi\Logger\iLoggerConsumer;
 use Pachisi\Logger\LoggerServiceAbstract;
 
 
 
-abstract class ErrorHandlerAbstract {
+abstract class ErrorHandlerAbstract implements iLoggerConsumer {
 
     /** @var  LoggerServiceAbstract */
     protected $_loggerServiceName;
@@ -34,7 +34,7 @@ abstract class ErrorHandlerAbstract {
     }
 
     public function _handleErrorAndLog($errno, $errstr, $errfile,  $errline, $errcontext) {
-        $this->logErrorOnService($errstr, $errfile, $errcontext);
+        $this->_logErrorOnService($errstr, $errfile, $errline, $errcontext);
         $this->_handle($errno, $errstr, $errfile,  $errline, $errcontext);
     }
 
@@ -44,11 +44,13 @@ abstract class ErrorHandlerAbstract {
      * @param $errfile
      * @param $errcontext
      */
-    protected function logErrorOnService($errstr, $errfile, $errcontext) {
+    protected function _logErrorOnService($errstr, $errfile, $errline, $errcontext) {
+        if(!is_array($errcontext)) {
+            $errcontext = get_object_vars($errcontext);
+        }
         if ($this->_loggerServiceName !== NULL) {
             $service = $this->_loggerServiceName;
-            $service::logger()->error("ERROR: '{$errstr}' in file '{$errfile}' in line '{$errfile}'",
-                $errcontext);
+            $service::logger()->error("ERROR: '{$errstr}' in file '{$errfile}' in line '{$errline}'", $errcontext);
         }
     }
 

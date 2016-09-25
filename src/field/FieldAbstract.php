@@ -18,8 +18,25 @@ use Pachisi\Field\Exception\FieldIsEmptyException;
  */
 abstract class FieldAbstract {
 
+    /** @var  integer */
+    protected $_fieldNr;
+
     /** @var  Man */
     protected $_man;
+
+    /**
+     * @return integer
+     */
+    public function getFieldNr() {
+        return $this->_fieldNr;
+    }
+
+    public function __construct($fieldNr) {
+        if(!is_numeric($fieldNr)) {
+            throw new \InvalidArgumentException(get_class($fieldNr).' is not an integer!');
+        }
+        $this->_fieldNr = $fieldNr;
+    }
 
     /**
      * @return Man

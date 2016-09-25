@@ -18,12 +18,12 @@ class FieldAbstractTests extends TestCase {
 
 
     public function testHasManNegative() {
-        $mockupField = new FieldAbstractTestMockup();
+        $mockupField = new FieldAbstractTestMockup(0);
         $this->assertFalse($mockupField->hasMan());
     }
 
     public function testHasManPositive() {
-        $mockupField = new FieldAbstractTestMockup();
+        $mockupField = new FieldAbstractTestMockup(0);
         $mockupField->_man = $this->_testMan1;
         $this->assertTrue($mockupField->hasMan());
     }
@@ -31,13 +31,13 @@ class FieldAbstractTests extends TestCase {
 
 
     public function testAttachManToEmptyField() {
-        $mockupField = new FieldAbstractTestMockup();
+        $mockupField = new FieldAbstractTestMockup(0);
         $mockupField->attachMan($this->_testMan1);
         $this->assertEquals($this->_testMan1, $mockupField->_man);
     }
 
     public function testAttachManOnOccupiedField() {
-        $mockupField = new FieldAbstractTestMockup();
+        $mockupField = new FieldAbstractTestMockup(0);
         $mockupField->_man = $this->_testMan1;
         $this->expectException('\Pachisi\Field\Exception\FieldIsNotEmptyException');
         $mockupField->attachMan($this->_testMan2);
@@ -46,13 +46,13 @@ class FieldAbstractTests extends TestCase {
 
 
     public function testDetachManFromOccupiedField() {
-        $mockupField = new FieldAbstractTestMockup();
+        $mockupField = new FieldAbstractTestMockup(0);
         $mockupField->_man = $this->_testMan1;
         $this->assertEquals($this->_testMan1, $mockupField->detachMan());
     }
 
     public function testDetachManFromEmptyField() {
-        $mockupField = new FieldAbstractTestMockup();
+        $mockupField = new FieldAbstractTestMockup(0);
         $this->expectException('\Pachisi\Field\Exception\FieldIsEmptyException');
         $mockupField->detachMan();
     }
