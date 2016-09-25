@@ -77,10 +77,10 @@ class GameController {
         LoggerService::logger()->info("Start new game round {$roundNr}");
         foreach($this->_playerList as $player) {
             $numberOfDicePoints = $this->_dice->rollDice();
-            LoggerService::logger()->info("Player '{$player->getPlayerIdentifier()}' rolled the dice a '{$numberOfDicePoints}'");
+            LoggerService::logger()->info("Player '{$player->getPlayerIdentifier()}' rolled the dice: "
+            ."'{$numberOfDicePoints}'");
             $this->_strategy->play($player, $numberOfDicePoints, $this->_gameBoard);
 
-            throw new PachisiException('test 12');
             // PRÜFE SIEGBEDINGUNG
         }
 
