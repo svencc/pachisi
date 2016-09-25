@@ -7,7 +7,7 @@ $ERROR_VERBOSE = true;
 // Random.org api settings
 // Activate/Deactivate the usage of random.org api to sustain random numbers
 // DEFAULT: false
-$USE_RANDOMORG_API = true;
+$USE_RANDOMORG_API = false;
 // Your personal API access key to use the API
 // DEFAULT: '000000...'
 $RANDOMORG_API_KEY = '000000...';

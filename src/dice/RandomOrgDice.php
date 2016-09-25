@@ -17,7 +17,7 @@ class RandomOrgDice extends DiceAbstract implements iLoggerConsumer  {
 
     protected $_generatedNumbersCache = array();
 
-    protected $_prefetchNumberSize = 999;
+    protected $_prefetchNumberSize = 99;
 
     protected $_loggerServiceName;
 
