@@ -1,12 +1,14 @@
+0. Das Programm liegt als zip gepackt unter https://github.com/svencc/pachisi/blob/master/pachisi_dist.zip bereit.
+
 1. Die Dateien im Ordner \logs müssen schreibbar sein.
 
-1. composer install muss ausgeführt werden.
+2. composer install muss ausgeführt werden.
 
-2. Die Dateien im Ordner /logs müssen schreibbar sein.
+3. Die Dateien im Ordner /logs müssen schreibbar sein.
 
-3. Die /local_config.php.template muss nach /local_config.php kopiert werden.
+4. Die /local_config.php.template muss nach /local_config.php kopiert werden.
 
-4. Die /local_config.php muss angepasst werden. Insbesondere können/müssen hier 2 Variablen gesetzt werden:
+5. Die /local_config.php muss angepasst werden. Insbesondere können/müssen hier 2 Variablen gesetzt werden:
 $USE_RANDOMORG_API = true;
 $RANDOMORG_API_KEY = '<dein_randomorg_api_schlüssel>';
 
